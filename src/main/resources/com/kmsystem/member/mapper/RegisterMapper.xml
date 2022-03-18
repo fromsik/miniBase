@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmsystem.member.mapper.RegisterMapper">
+	
+	<insert id="createRegister" useGeneratedKeys="true" keyProperty="memberId">
+		INSERT INTO member
+			( mem_id
+			, mem_pw
+			, mem_name
+			)
+		VALUES
+			( #{memId}
+			, #{memPw}
+			, #{memName}
+			)
+	</insert>
+	
+	<insert id="createRegisterAuth">
+		INSERT INTO member_auth
+			( member_id
+			, auth
+			)
+		VALUES
+			( #{memberId}
+			, #{auth}
+			)
+	</insert>
+
+	<resultMap type="ResRegister" id="resRegisteMap">
+		<id property="memberId" column="member_id" />
+		<result property="memId" column="mem_id" />
+		<result property="memPw" column="mem_pw" />
+		<result property="memName" column="mem_name" />
+		<collection property="authList" resultMap="authListMap">
+		</collection>
+	</resultMap>
+
+	<resultMap type="ResgisterAuth" id="authListMap">
+		<result property="memberId" column="member_id" />
+		<result property="auth" column="auth" />
+	</resultMap>
+
+	<select id="readRegister" resultMap="resRegisteMap">
+		SELECT m.member_id
+			 , mem_id
+			 , mem_pw
+			 , mem_name
+			 , auth
+		FROM member m
+		LEFT OUTER JOIN member_auth auth ON auth.member_id = m.member_id  /* auth권한 */
+		WHERE mem_id = #{memId}
+	</select>
+
+	<select id="readMember" resultType="Member">
+		SELECT member_id
+			 , mem_id
+			 , mem_pw
+			 , mem_name
+		FROM member
+		WHERE member_id = #{memberId}
+	</select>
+</mapper>

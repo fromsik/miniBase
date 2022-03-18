@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmsystem.file.mapper.FileMapper">
+	
+	<insert id="insertFileInfo">
+		INSERT INTO file
+		(
+			document_id,
+			file_nm,
+			file_tr_nm,
+			file_url,
+			file_size,
+			last_chg_dt
+		)
+		VALUES
+			 (
+			   #{documentId},
+		       #{fileNm},
+			   #{fileTrNm},
+			   #{fileUrl},
+			   #{fileSize},
+		       now()
+			 )
+	</insert>
+
+	<update id="updateFileInfo">
+		UPDATE file SET
+			document_id = #{documentId},
+			file_nm = #{fileNm},
+			file_tr_nm = #{fileTrNm},
+			file_url = #{fileUrl},
+			file_size = #{fileSize},
+			last_chg_dt = now()
+		WHERE file_id = #{fileId}
+	</update>
+
+	<delete id="deleteFile">
+		DELETE FROM file WHERE file_id = #{fileId}
+	</delete>
+
+	<select id="readFileOne" resultType="file">
+		SELECT
+			file_id,
+			document_id,
+			file_nm,
+			file_tr_nm,
+			file_url,
+			file_size
+		FROM file
+		WHERE file_id = #{fileId}
+	</select>
+
+	<select id="readFileOneByFileTrNm" resultType="file">
+		SELECT
+		file_id,
+		document_id,
+		file_nm,
+		file_tr_nm,
+		file_url,
+		file_size
+		FROM file
+		WHERE file_tr_nm = #{fileTrNm}
+	</select>
+</mapper>

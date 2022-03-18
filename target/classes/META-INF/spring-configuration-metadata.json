@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "com.kmsystem",
+      "type": "com.kmsystem.config.Properties",
+      "sourceType": "com.kmsystem.config.Properties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "com.kmsystem.secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.kmsystem.config.Properties"
+    },
+    {
+      "name": "com.kmsystem.upload-path",
+      "type": "java.lang.String",
+      "sourceType": "com.kmsystem.config.Properties"
+    }
+  ],
+  "hints": []
+}

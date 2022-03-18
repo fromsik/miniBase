@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmsystem.document.mapper.DivisionMapper">
+
+	<select id="readDivisionList" resultType="ResCategoryList">
+		SELECT
+			c.category_id AS categoryId
+		,	c.category_type AS categoryType
+		,   c.category_name AS categoryName
+		,   COUNT(c.category_type) AS docCount
+		FROM document_result dr
+		LEFT OUTER JOIN document d ON d.document_id = dr.document_id  /* document */
+		LEFT OUTER JOIN category c ON c.category_id = dr.category_id  /* category */
+		WHERE d.member_id = #{memberId}
+		GROUP BY c.category_id
+	</select>
+
+	<select id="countTotalCount" resultType="int">
+		SELECT COUNT(*)
+		FROM document_result dr
+		LEFT OUTER JOIN document d ON d.document_id = dr.document_id  /* document */
+		WHERE d.member_id = #{memberId}
+	</select>
+
+	<select id="readDivisionPossibleList" resultType="ResDocument">
+		SELECT dr.document_id     AS documentId
+			 , d.document_ori     AS documentOri
+			 , d.document_name    AS documentName
+			 , d.document_type    AS documentType
+			 , d.result_type      AS resultType
+			 , d.member_id        AS memberId
+			 , dr.document_result AS documentResult
+			 , dr.category_id     AS categoryId
+			 , dr.use_time        AS useTime
+			 , dr.last_chg_dt     AS lastChgDt
+			 , file_id            AS fileId
+			 , file_nm            AS fileNm
+			 , file_tr_nm         AS fileTrNm
+			 , file_url           AS fileUrl
+			 , file_size          AS fileSize
+		FROM document_result dr
+		LEFT OUTER JOIN document d ON d.document_id = dr.document_id  /* document_result */
+		LEFT OUTER JOIN file f     ON f.document_id = d.document_id  /* file */
+		WHERE d.member_id = #{memberId}
+		AND dr.category_id IS NULL
+	</select>
+
+	<update id="updateDocumentCategory">
+		UPDATE document_result SET
+		category_id = (SELECT category_id FROM category WHERE category_type = #{categoryType}),
+		use_time = #{useTime}
+		WHERE document_id = #{documentId}
+	</update>
+
+	<select id="readDocResultList" resultType="ResDocResultList">
+		SELECT dr.document_id  AS documentId
+			 , d.document_name AS documentName
+			 , d.document_type AS documentType
+			 , dr.category_id  AS categoryId
+			 , c.category_name AS categoryName
+			 , c.category_type AS categoryType
+			 , dr.last_chg_dt  AS lastChgDt
+		FROM document d
+		LEFT OUTER JOIN document_result dr ON d.document_id = dr.document_id  /* document_result */
+		LEFT OUTER JOIN category        c  ON c.category_id = dr.category_id  /* category */
+		WHERE d.member_id = #{memberId}
+		AND dr.category_id is not null
+	</select>
+
+	<update id="updateDocumentCategoryId">
+		UPDATE document_result
+			SET category_id = #{categoryId}
+			  , last_chg_dt = now()
+		WHERE document_id = #{documentId}
+	</update>
+
+
+</mapper>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmsystem.document.mapper.DocumentMapper">
+	
+	<insert id="createDocument" useGeneratedKeys="true" keyProperty="documentId">
+		INSERT INTO document
+		(
+			document_ori,
+			document_name,
+			document_type,
+			result_type,
+			last_chg_dt,
+			member_id
+		)
+		VALUES
+			 (
+			   #{documentOri},
+		       #{documentName},
+			   #{documentType},
+			   #{resultType},
+		       now(),
+		       #{memberId}
+			 )
+	</insert>
+
+	<select id="readDocumentList" resultType="ResDocumentList">
+		SELECT
+		COUNT(CASE WHEN result_type = 'T' THEN 1 END) AS textCount,
+		COUNT(CASE WHEN result_type = 'I' THEN 1 END) AS imgCount,
+		last_chg_dt AS lastChgDt
+		FROM document
+		WHERE member_id = #{memberId}
+		GROUP BY last_chg_dt
+	</select>
+
+	<select id="readDocumentAllList" resultType="ResDocumentAllList">
+		SELECT d.document_id AS documentId
+		, document_name AS documentName
+		, document_type AS documentType
+		, result_type   AS resultType
+		, d.last_chg_dt AS lastChgDt
+		, mem_name      AS memName
+		, file_nm 		 AS fileNm
+		, file_url 	 AS fileUrl
+		, file_size 	 AS fileSize
+		FROM document d
+		LEFT OUTER JOIN member m ON m.member_id   = d.member_id    /* member */
+		LEFT OUTER JOIN file   f ON f.document_id = d.document_id  /* file */
+		WHERE d.member_id = #{memberId}
+		ORDER BY d.last_chg_dt DESC
+	</select>
+
+	<select id="readDocConvertList" resultType="Document">
+		SELECT
+		dr.document_id AS documentId,
+		d.document_name AS documentName,
+		dr.last_chg_dt AS lastChgDt
+		FROM document d
+		LEFT OUTER JOIN document_result dr ON d.document_id = dr.document_id  /* document_result */
+		WHERE d.member_id = #{memberId}
+		AND d.result_type = #{resultType}
+	</select>
+
+	<select id="readDocUploadList" resultType="ResDocUploadList">
+		SELECT
+		d.document_id AS documentId,
+		d.document_name AS documentName,
+		f.file_size AS fileSize,
+		f.file_tr_nm AS FileTrNm,
+		d.last_chg_dt AS lastChgDt
+		FROM document d
+		LEFT OUTER JOIN file f ON f.document_id = d.document_id  /* file */
+		LEFT OUTER JOIN document_result dr ON d.document_id = dr.document_id  /* document_result */
+		WHERE d.member_id = #{memberId}
+		AND result_type = #{resultType}
+		AND dr.document_id IS null
+	</select>
+
+	<select id="readDocument" resultType="ResDocument">
+		SELECT
+		d.document_id AS documentId,
+		d.document_ori AS documentOri,
+		d.document_name AS documentName,
+		d.document_type AS documentType,
+		d.result_type AS resultType,
+		d.member_id AS memberId,
+		dr.document_result AS documentResult,
+		dr.category_id AS categoryId,
+		c.category_name AS categoryName,
+		c.category_type AS categoryType,
+		dr.use_time AS useTime,
+		file_id AS fileId,
+		file_nm AS fileNm,
+		file_tr_nm AS fileTrNm,
+		file_url AS fileUrl,
+		file_size AS fileSize
+		FROM document d
+		LEFT OUTER JOIN document_result dr ON d.document_id = dr.document_id  /* document_result */
+		LEFT OUTER JOIN category c ON c.category_id = dr.category_id  /* category */
+		LEFT OUTER JOIN file f ON f.document_id = d.document_id  /* file */
+		WHERE d.document_id = #{documentId}
+	</select>
+
+	<insert id="createDocumentResult">
+		INSERT INTO document_result
+		(
+		document_id,
+		document_result,
+		last_chg_dt
+		)
+		VALUES
+		(
+		#{documentId},
+		#{documentResult},
+		now()
+		)
+	</insert>
+
+	<delete id="deleteDocument">
+		DELETE FROM document WHERE document_id = #{documentId}
+	</delete>
+
+	<select id="readDocumentByFileTrNm" resultType="ResDocument">
+		SELECT
+		d.document_id AS documentId,
+		d.document_ori AS documentOri,
+		d.document_name AS documentName,
+		d.document_type AS documentType,
+		d.result_type AS resultType,
+		d.member_id AS memberId,
+		dr.document_result AS documentResult,
+		dr.category_id AS categoryId,
+		c.category_name AS categoryName,
+		c.category_type AS categoryType,
+		dr.use_time AS useTime,
+		file_id AS fileId,
+		file_nm AS fileNm,
+		file_tr_nm AS fileTrNm,
+		file_url AS fileUrl,
+		file_size AS fileSize
+		FROM document d
+		LEFT OUTER JOIN document_result dr ON d.document_id = dr.document_id  /* document_result */
+		LEFT OUTER JOIN category c ON c.category_id = dr.category_id  /* category */
+		LEFT OUTER JOIN file f ON f.document_id = d.document_id  /* file */
+		WHERE file_tr_nm = #{fileTrNm}
+	</select>
+</mapper>

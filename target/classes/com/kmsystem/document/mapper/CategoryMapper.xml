@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmsystem.document.mapper.CategoryMapper">
+
+	<insert id="createCategory">
+		INSERT INTO category
+		(
+			category_name,
+			category_type
+		)
+		VALUES
+		(
+			#{categoryName},
+			#{categoryType}
+		)
+	</insert>
+
+	<select id="readCategoryList" resultType="Category">
+		SELECT
+			category_id,
+			category_name,
+			category_type
+		FROM category
+	</select>
+
+	<select id="readCategoryByCategoryType" resultType="Category">
+		SELECT
+		category_id,
+		category_name,
+		category_type
+		FROM category
+		WHERE category_type = #{categoryType}
+	</select>
+
+	<update id="updateCategory">
+		UPDATE category
+		SET category_name = #{categoryName}
+		  , category_type = #{categoryType}
+		WHERE category_id = #{categoryId}
+	</update>
+</mapper>
